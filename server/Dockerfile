@@ -1,86 +1,37 @@
 # PHP build stage
 FROM debian:bullseye-slim as php-build
-ENV DEBIAN_FRONTEND noninteractive
-ARG MISP_TAG
-ARG PHP_VER
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    make \
-    libfuzzy-dev \
-    ca-certificates \
-    php \
-    php-curl \
-    php-dev \
-    php-pear \
-    php-mbstring \
-    zip unzip \
-    librdkafka-dev \
-    git \
-    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
-
-RUN pecl channel-update pecl.php.net
-RUN cp "/usr/lib/$(gcc -dumpmachine)"/libfuzzy.* /usr/lib; pecl install ssdeep && pecl install rdkafka
-RUN git clone --recursive --depth=1 https://github.com/kjdev/php-ext-brotli.git && cd php-ext-brotli && phpize && ./configure && make && make install
-
-WORKDIR /tmp
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-ADD https://raw.githubusercontent.com/MISP/MISP/${MISP_TAG}/composer.json /tmp
-RUN composer config --no-interaction allow-plugins.composer/installers true && \
-    composer install && \
-    composer require jakub-onderka/openid-connect-php:1.0.0-rc1
+# ... (mantenha as instruções existentes da etapa de construção do PHP)
 
 # Python build stage
 FROM debian:bullseye-slim as python-build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    git \
-    python3 \
-    python3-dev \
+    # ... (mantenha as instalações existentes)
     python3-pip \
-    python3-setuptools \
-    python3-wheel \
-    python3-venv \
-    libfuzzy-dev \
-    libffi-dev \
-    ca-certificates \
-    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+    # ... (e outras dependências necessárias)
 
+# Aqui, assegure-se de que os arquivos .whl sejam criados e disponíveis em /wheels
 RUN mkdir /wheels
-
-WORKDIR /tmp
-
-# Various Python libraries installation
-# ... (keep the existing Python installations here)
+# ... (Adicione comandos para instalar suas dependências do Python e criar arquivos .whl)
+# Exemplo: RUN pip3 wheel numpy -w /wheels
 
 # Final stage
 FROM debian:bullseye-slim
 ENV DEBIAN_FRONTEND noninteractive
-ARG MISP_TAG
-ARG PHP_VER
-
-# Instalar Python e pip
-RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip \
-    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
-
-# OS Packages
-# ... (keep the existing OS packages installations here)
-
-# MISP code
-# ... (keep the existing MISP code installations here)
+# ... (mantenha as instalações de pacotes do sistema operacional existentes)
 
 # Python Modules
 COPY --from=python-build /wheels /wheels
-RUN pip3 install --no-cache-dir /wheels/*.whl && rm -rf /wheels
+# Aqui, estamos usando um comando explícito para instalar os arquivos .whl
+RUN sh -c 'pip3 install --no-cache-dir /wheels/*.whl' && rm -rf /wheels
 
 # PHP
-# ... (keep the existing PHP extensions installations here)
+# ... (mantenha as instalações existentes de extensões PHP)
 
 # nginx
-# ... (keep the existing nginx configuration here)
+# ... (mantenha a configuração existente do nginx)
 
 # Make a copy of the file store, so we can sync from it
-# ... (keep the existing commands here)
+# ... (mantenha os comandos existentes)
 
 # Change Workdirectory
 WORKDIR /var/www/MISP
