@@ -24,7 +24,7 @@ ARG PHP_VER
 
     WORKDIR /tmp
     COPY --from=composer /usr/bin/composer /usr/bin/composer
-    ADD https://raw.githubusercontent.com/MISP/MISP/${MISP_TAG}/app/composer.json /tmp
+    ADD https://raw.githubusercontent.com/MISP/MISP/app/composer.json /tmp
     RUN composer config --no-interaction allow-plugins.composer/installers true && \
         composer install && \
         composer require jakub-onderka/openid-connect-php:1.0.0-rc1
