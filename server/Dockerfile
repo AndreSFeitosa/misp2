@@ -46,17 +46,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-# Criação do diretório /wheels
 RUN mkdir /wheels
 
 WORKDIR /tmp
-# ... (Continue com a instalação de bibliotecas Python e outras operações necessárias)
+
+# Various Python libraries installation
+# ... (mantenha as instalações de bibliotecas Python existentes)
 
 # Final stage
 FROM debian:bullseye-slim
 ENV DEBIAN_FRONTEND noninteractive
 ARG MISP_TAG
 ARG PHP_VER
+
+# Instalar python3-pip
+RUN apt-get update && apt-get install -y --no-install-recommends python3-pip && rm -rf /var/lib/apt/lists/*
 
 # OS Packages
 # ... (mantenha as instalações de pacotes OS existentes)
