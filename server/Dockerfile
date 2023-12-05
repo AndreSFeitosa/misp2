@@ -59,6 +59,9 @@ ENV DEBIAN_FRONTEND noninteractive
 ARG MISP_TAG
 ARG PHP_VER
 
+# Install pip3 in the final image
+RUN apt-get update && apt-get install -y python3-pip && rm -rf /var/lib/apt/lists/*
+
 # OS Packages
 # ... (keep the existing OS packages installations here)
 
